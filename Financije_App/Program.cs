@@ -29,7 +29,7 @@ while (true)
                     CreateUser(userList, ref nextId);
                     break;
                 case 2:
-                    //DeleteUser();
+                    DeleteUser();
                     break;
                 case 3:
                     //EditUser();
