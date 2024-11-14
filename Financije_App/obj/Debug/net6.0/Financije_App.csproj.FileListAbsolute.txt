@@ -1,0 +1,5 @@
+C:\Users\laura\OneDrive\Desktop\DUMP\Financije_App\Financije_App\obj\Debug\net6.0\Financije_App.csproj.AssemblyReference.cache
+C:\Users\laura\OneDrive\Desktop\DUMP\Financije_App\Financije_App\obj\Debug\net6.0\Financije_App.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\laura\OneDrive\Desktop\DUMP\Financije_App\Financije_App\obj\Debug\net6.0\Financije_App.AssemblyInfoInputs.cache
+C:\Users\laura\OneDrive\Desktop\DUMP\Financije_App\Financije_App\obj\Debug\net6.0\Financije_App.AssemblyInfo.cs
+C:\Users\laura\OneDrive\Desktop\DUMP\Financije_App\Financije_App\obj\Debug\net6.0\Financije_App.csproj.CoreCompileInputs.cache
