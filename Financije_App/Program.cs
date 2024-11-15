@@ -549,7 +549,7 @@ static void PrintUsers(List<(int, string, string, DateOnly, List<(string, double
                     break;
                 case 3:
                     PrintNegativeAccount(userList);
-                    Console.WriteLine("Pritisni Enter za povratak na glavni izbornik...");
+                    Console.WriteLine("Pritisni Enter za povratak na glavni izbornik..");
                     Console.ReadKey();
                     break;
                 default:
