@@ -285,9 +285,15 @@ static void DeleteUser(List<(int, string, string, DateOnly, List<(string, double
     if (choice == 1)
     {
         DeleteUserById(userList);
+        Console.WriteLine("Pritisni Enter za povratak na glavni izbornik...");
+        Console.ReadKey();
+        return;
     }
     else {
         DeleteUserByFullName(userList);
+        Console.WriteLine("Pritisni Enter za povratak na glavni izbornik...");
+        Console.ReadKey();
+        return;
     }
 
     Console.WriteLine("Pritisnite Enter za povratak u glavni izbornik...");
@@ -345,7 +351,6 @@ static void DeleteUserById(List < (int, string, string, DateOnly, List<(string, 
 
     } while (!userFound);
 
-    Console.WriteLine("Pritisnite Enter za povratak u glavni izbornik...");
     return;
 }
 
@@ -374,13 +379,8 @@ static void DeleteUserByFullName(List < (int, string, string, DateOnly, List<(st
 
     if (splitName.Length != 2)
     {
-        Console.WriteLine("Pogrešan unos. Molimo unesite ime i prezime u formatu 'Ime Prezime'.");
+        Console.WriteLine("Pogrešan unos. Unos mora biti u formatu 'Ime Prezime'.");
         return;
-    }
-
-    foreach (var user in userList)
-    {
-        Console.WriteLine($"ID: {user.Item1}, Ime: {user.Item2}, Prezime: {user.Item3}");
     }
 
     var firstName = splitName[0];
@@ -390,11 +390,12 @@ static void DeleteUserByFullName(List < (int, string, string, DateOnly, List<(st
 
     do
     {
+        userFound = false;
+
         for (int i = 0; i < userList.Count; i++)
         {
             if (userList[i].Item2 == firstName && userList[i].Item3 == lastName)
             {
-                Console.WriteLine($"Korisnik s imenom {firstName} {lastName} pronađen. Brisanje korisnika...");
                 userList.RemoveAt(i);
                 userFound = true;
                 Console.WriteLine($"Korisnik {firstName} {lastName} uspješno izbrisan.");
@@ -410,10 +411,158 @@ static void DeleteUserByFullName(List < (int, string, string, DateOnly, List<(st
 
     } while(!userFound);
 
-    Console.WriteLine("Pritisnite Enter za povratak u glavni izbornik...");
     return;
 }
 
-static void PrintUsers(List<(int, string, string, DateOnly, List<(string, double, List<(int, double, string, string, string, DateTime)>)>)> userList) {
-    
+static void PrintAlphabetically(List<(int, string, string, DateOnly, List<(string, double, List<(int, double, string, string, string, DateTime)>)>)> userList)
+{
+    if (userList.Count == 0)
+    {
+        Console.WriteLine("Nema korisnika za ispis.");
+    }
+
+    for (int i = 0; i < userList.Count; i++)
+    {
+        for (int j = i + 1; j < userList.Count; j++)
+        {
+            if (string.Compare(userList[i].Item3, userList[j].Item3) > 0)
+            {
+                var temp = userList[i];
+                userList[i] = userList[j];
+                userList[j] = temp;
+            }
+        }
+    }
+    Console.WriteLine("Ispis korisnika abecedno po prezimenu:");
+    foreach (var user in userList)
+    {
+        Console.WriteLine($"{user.Item1} - {user.Item2} - {user.Item3} - {user.Item4}");
+    }
+    Console.WriteLine("Pritisni Enter za izlaz...");
+    Console.ReadKey();
+    return;
 }
+
+static void PrintOver30Years(List<(int, string, string, DateOnly, List<(string, double, List<(int, double, string, string, string, DateTime)>)>)> userList)
+{
+    if (userList.Count == 0)
+    {
+        Console.WriteLine("Nema korisnika za ispis.");
+        return;
+    }
+
+    DateOnly currentDate = DateOnly.FromDateTime(DateTime.Now);
+
+    Console.WriteLine("Ispis korisnika starijih od 30 godina:");
+
+    foreach (var user in userList)
+    {
+        int age = currentDate.Year - user.Item4.Year;
+
+        if (currentDate < user.Item4.AddYears(age))
+        {
+            age--;
+        }
+
+        if (age > 30)
+        {
+            Console.WriteLine($"{user.Item1} - {user.Item2} - {user.Item3} - {user.Item4}");
+        }
+    }
+
+    Console.WriteLine("Pritisni Enter za izlaz...");
+    Console.ReadKey();
+}
+
+static void PrintNegativeAccount(List<(int, string, string, DateOnly, List<(string, double, List<(int, double, string, string, string, DateTime)>)>)> userList)
+{
+    if (userList.Count == 0)
+    {
+        Console.WriteLine("Nema korisnika za ispis.");
+        return;
+    }
+
+    bool foundNegativeAccount = false;
+    bool hasNegativeAccount = false;
+
+    Console.WriteLine("Ispis korisnika s barem jednim računom u minusu:");
+
+    foreach (var user in userList)
+    {
+        hasNegativeAccount = false;
+
+        foreach (var account in user.Item5)
+        {
+
+            foreach (var transaction in account.Item3)
+            {
+                if (transaction.Item2 < 0)
+                {
+                    hasNegativeAccount = true;
+                    break;
+                }
+            }
+
+            if (hasNegativeAccount) break;
+
+        }
+
+        if (hasNegativeAccount)
+        {
+            foundNegativeAccount = true;
+            Console.WriteLine($"{user.Item1} - {user.Item2} - {user.Item3} - {user.Item4}");
+        }
+
+    }
+
+    if (!hasNegativeAccount)
+    {
+        Console.WriteLine("Nema korisnika s računima u minusu.");
+    }
+
+    Console.WriteLine("Pritisni Enter za izlaz...");
+    Console.ReadKey();
+    return;
+}
+
+static void PrintUsers(List<(int, string, string, DateOnly, List<(string, double, List<(int, double, string, string, string, DateTime)>)>)> userList)
+{
+
+    Console.WriteLine("Odaberi nacin ispisivanja korisnika:\n\t1 - abecedno po prezimenu\n\t2 - svih onih koji imaju više od 30 godina\n\t3 - svih onih koji imaju barem jedan račun u minusu");
+
+    while (true)
+    {
+        Console.Write("Unesite broj opcije: ");
+        if (int.TryParse(Console.ReadLine(), out var choice))
+        {
+            switch (choice)
+            {
+                case 1:
+                    PrintAlphabetically(userList);
+                    Console.WriteLine("Pritisni Enter za povratak na glavni izbornik...");
+                    Console.ReadKey();
+                    break;
+                case 2:
+                    PrintOver30Years(userList);
+                    Console.WriteLine("Pritisni Enter za povratak na glavni izbornik...");
+                    Console.ReadKey();
+                    break;
+                case 3:
+                    PrintNegativeAccount(userList);
+                    Console.WriteLine("Pritisni Enter za povratak na glavni izbornik...");
+                    Console.ReadKey();
+                    break;
+                default:
+                    Console.WriteLine("Opcija nije ponudena! Pokusajte ponovno.");
+                    break;
+            }
+        }
+        else
+        {
+            Console.WriteLine("Unos mora biti broj (1, 2, ili 3)!");
+            continue;
+        }
+        break;
+    }
+}
+
