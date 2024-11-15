@@ -35,8 +35,7 @@ while (true)
                     DeleteUser(userList);
                     break;
                 case 3:
-                    CreateTransaction(userList, ref nextTransactionId);
-                    //EditUser();
+                    //CreateTransaction(userList, ref nextTransactionId);
                     break;
                 case 4:
                     PrintUsers(userList);
@@ -102,11 +101,9 @@ while (true)
         switch (transactionOption) {
             case 1:
                 CreateTransaction(userList, ref nextTransactionId);
-                Console.WriteLine("Pritisni Enter za povratak na glavni izbornik...");
-                Console.ReadKey();
-                return;
+                continue;
             case 2:
-                //DeleteTransaction(selectedAccount);
+                DeleteTransactions(selectedAccount.Item3);
                 break;
             case 3:
                 //EditTransaction(selectedAcount);
@@ -373,16 +370,29 @@ static void CreateTransaction(List<(int, string, string, DateOnly, List<(string,
 
     var transaction = (nextTransactionId++, amount, description, (transactionType == 1) ? "Prihod" : "Rashod", category, DateTime.Now);
 
-    for (int i = 0; i < userList.Count; i++)
+    Console.WriteLine("Odaberite račun za transakciju:");
+    for (int i = 0; i < selectedUser.Item5.Count; i++)
     {
-        if (userList[i].Item1 == selectedUser.Item1)
+        Console.WriteLine($"{i + 1} - {selectedUser.Item5[i].Item1} (Stanje: {selectedUser.Item5[i].Item2} EUR)");
+    }
+
+    int accountIndex;
+    while (true)
+    {
+        int.TryParse(Console.ReadLine(), out accountIndex);
+
+        if (accountIndex >= 1 && accountIndex <= selectedUser.Item5.Count)
         {
-            userList[i].Item5.Add((category, amount, new List<(int, double, string, string, string, DateTime)> { transaction }));
+            selectedUser.Item5[accountIndex - 1].Item3.Add(transaction);
             break;
+        }
+        else
+        {
+            Console.WriteLine("Nevažeći odabir računa. Pokušajte ponovo.");
         }
     }
 
-    Console.WriteLine("Transakcija uspjesno dodana! Pritisnite Enter za izlaz...");
+    Console.WriteLine("Transakcija uspješno dodana na odabrani račun! Pritisnite Enter za izlaz...");
     Console.ReadKey();
     return;
 }
@@ -696,5 +706,102 @@ static void PrintUsers(List<(int, string, string, DateOnly, List<(string, double
         }
         break;
     }
+}
+
+static void DeleteTransactions(List<(int, double, string, string, string, DateTime)> transactions)
+{
+    if (transactions.Count == 0)
+    {
+        Console.WriteLine("Nema dostupnih transakcija za brisanje.");
+        return;
+    }
+
+    Console.WriteLine("Odaberite opciju za brisanje transakcija:\n\t1 - po ID-u\n\t2 - ispod unesenog iznosa\n\t3 - iznad unesenog iznosa\n\t4 - svih prihoda\n\t5 - svih rashoda\n\t6 - svih transakcija za odabranu kategoriju");
+
+
+    int.TryParse(Console.ReadLine(), out var option);
+
+    switch (option)
+    {
+        case 1:
+            DeleteTransactionById(transactions);
+            break;
+        case 2:
+            DeleteTransactionsBelowAmount(transactions);
+            break;
+        case 3:
+            DeleteTransactionsAboveAmount(transactions);
+            break;
+        case 4:
+            DeleteAllIncome(transactions);
+            break;
+        case 5:
+            DeleteAllExpenses(transactions);
+            break;
+        case 6:
+            DeleteTransactionsByCategory(transactions);
+            break;
+        default:
+            Console.WriteLine("Nevažeća opcija!");
+            break;
+    }
+}
+static void DeleteTransactionById(List<(int, double, string, string, string, DateTime)> transactions)
+{
+    Console.WriteLine("Sve transakcije:");
+    foreach (var transaction in transactions)
+    {
+        Console.WriteLine($"ID: {transaction.Item1}, Iznos: {transaction.Item2} EUR, Opis: {transaction.Item3}, Tip: {transaction.Item4}, Kategorija: {transaction.Item5}, Datum: {transaction.Item6}");
+    }
+
+    Console.Write("Unesite ID transakcije za brisanje: ");
+    int.TryParse(Console.ReadLine(), out var id);
+
+    var transactionToRemove = transactions.Find(t => t.Item1 == id);
+
+    if (transactionToRemove.Item1 != 0)
+    {
+        transactions.Remove(transactionToRemove);
+        Console.WriteLine("Transakcija uspješno obrisana!");
+        return;
+    }
+    else
+    {
+        Console.WriteLine("Transakcija s tim ID-om nije pronađena.");
+    }
+}
+static void DeleteTransactionsBelowAmount(List<(int, double, string, string, string, DateTime)> transactions)
+{
+    Console.Write("Unesite iznos ispod kojeg želite izbrisati sve transakcije: ");
+    double.TryParse(Console.ReadLine(), out var amount);
+
+    transactions.RemoveAll(t => t.Item2 < amount);
+    Console.WriteLine($"Sve transakcije ispod {amount} EUR su obrisane.");
+}
+static void DeleteTransactionsAboveAmount(List<(int, double, string, string, string, DateTime)> transactions)
+{
+    Console.Write("Unesite iznos iznad kojeg želite izbrisati sve transakcije: ");
+    double.TryParse(Console.ReadLine(), out var amount);
+
+    transactions.RemoveAll(t => t.Item2 > amount);
+    Console.WriteLine($"Sve transakcije iznad {amount} EUR su obrisane.");
+}
+static void DeleteAllIncome(List<(int, double, string, string, string, DateTime)> transactions)
+{
+    transactions.RemoveAll(t => t.Item4 == "Prihod");
+    Console.WriteLine("Sve transakcije tipa 'Prihod' su obrisane.");
+}
+static void DeleteAllExpenses(List<(int, double, string, string, string, DateTime)> transactions)
+{
+    transactions.RemoveAll(t => t.Item4 == "Rashod");
+    Console.WriteLine("Sve transakcije tipa 'Rashod' su obrisane.");
+}
+static void DeleteTransactionsByCategory(List<(int, double, string, string, string, DateTime)> transactions)
+{
+    Console.Write("Unesite kategoriju za brisanje transakcija: ");
+    var category = Console.ReadLine();
+
+    transactions.RemoveAll(t => t.Item5.Equals(category, StringComparison.OrdinalIgnoreCase));
+    Console.WriteLine($"Sve transakcije za kategoriju '{category}' su obrisane.");
 }
 
