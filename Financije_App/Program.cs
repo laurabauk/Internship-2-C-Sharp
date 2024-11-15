@@ -52,6 +52,31 @@ while (true)
     else if (option == 2)
     {
         Console.WriteLine("2. Racuni");
+        Console.WriteLine("Unesite ime i prezime korisnika cijim racunima zelite upravljati: ");
+
+        var wantedUser = Console.ReadLine();
+        var user = userList.Find(u => u.Item2== wantedUser);
+
+        if (user.Equals(default((int, string, string, DateOnly, List<(string, double, List<(int, double, string, string, string, DateTime)>)>))))
+        {
+            Console.WriteLine("Korisnik nije pronaden!");
+            return;
+        }
+
+        Console.WriteLine("1 - Pregled racuna");
+
+        int.TryParse(Console.ReadLine(), out var accountOption);
+
+        switch (accountOption) {
+            case 1:
+                PrintAccounts(user.Item5);
+                break;
+            default:
+                Console.WriteLine("Opcija nije ponudena!");
+                break;
+        }
+
+
     }
     else if (option == 3)
     {
@@ -62,6 +87,59 @@ while (true)
     {
         Console.WriteLine("Nevazeca opcija! Pokusajte ponovno.");
     }
+}
+static void PrintAccounts(List<(int, string, string, DateOnly, List<(string, double, List<(int, double, string, string, string, DateTime)>)>)> userList)
+{
+    if (userList.Count == 0)
+    {
+        Console.WriteLine("Nema dostupnih korisnika za prikaz računa.");
+        return;
+    }
+
+    Console.WriteLine("Odaberite korisnika po ID-u za pregled računa:");
+    foreach (var user in userList)
+    {
+        Console.WriteLine($"ID: {user.Item1}, Ime: {user.Item2}, Prezime: {user.Item3}");
+    }
+
+    int.TryParse(Console.ReadLine(), out var userId);
+    var selectedUser = userList.Find(user => user.Item1 == userId);
+
+    if (selectedUser.Equals(default((int, string, string, DateOnly, List<(string, double, List<(int, double, string, string, string, DateTime)>)>))))
+    {
+        Console.WriteLine("Korisnik nije pronađen.");
+        return;
+    }
+
+    Console.WriteLine($"\nRačuni korisnika {selectedUser.Item2} {selectedUser.Item3}:");
+
+    if (selectedUser.Item5.Count == 0)
+    {
+        Console.WriteLine("Ovaj korisnik nema računa.");
+        return;
+    }
+
+    for (int i = 0; i < selectedUser.Item5.Count; i++)
+    {
+        var account = selectedUser.Item5[i];
+        Console.WriteLine($"[{i + 1}] Vrsta računa: {account.Item1}, Stanje: {account.Item2} EUR");
+
+        if (account.Item3.Count > 0)
+        {
+            Console.WriteLine("  Transakcije:");
+            foreach (var transaction in account.Item3)
+            {
+                Console.WriteLine($"    ID: {transaction.Item1}, Iznos: {transaction.Item2} EUR, Opis: {transaction.Item3}, Kategorija: {transaction.Item4}, Tip: {transaction.Item5}, Datum: {transaction.Item6}");
+            }
+        }
+        else
+        {
+            Console.WriteLine("  Nema transakcija za ovaj račun.");
+        }
+    }
+
+    Console.WriteLine("\nPritisnite Enter za povratak na glavni izbornik...");
+    Console.ReadKey();
 }
 
 static void CreateUser(List<(int, string, string, DateOnly, List<(string, double, List<(int, double, string, string, string, DateTime)>)>)> userList, ref int nextId)
