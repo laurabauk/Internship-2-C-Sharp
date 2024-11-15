@@ -109,7 +109,7 @@ while (true)
                 //EditTransaction(selectedAcount);
                 break;
             case 4:
-                //PrintTransactions(selectedAccount);
+                ViewTransactions(selectedAccount.Item3);
                 break;
             case 5:
                 //PrintFinancialReport(selectedAccount);
@@ -742,10 +742,11 @@ static void DeleteTransactions(List<(int, double, string, string, string, DateTi
             DeleteTransactionsByCategory(transactions);
             break;
         default:
-            Console.WriteLine("Nevažeća opcija!");
+            Console.WriteLine("Nevazeca opcija!");
             break;
     }
 }
+
 static void DeleteTransactionById(List<(int, double, string, string, string, DateTime)> transactions)
 {
     Console.WriteLine("Sve transakcije:");
@@ -770,6 +771,7 @@ static void DeleteTransactionById(List<(int, double, string, string, string, Dat
         Console.WriteLine("Transakcija s tim ID-om nije pronađena.");
     }
 }
+
 static void DeleteTransactionsBelowAmount(List<(int, double, string, string, string, DateTime)> transactions)
 {
     Console.Write("Unesite iznos ispod kojeg želite izbrisati sve transakcije: ");
@@ -778,6 +780,7 @@ static void DeleteTransactionsBelowAmount(List<(int, double, string, string, str
     transactions.RemoveAll(t => t.Item2 < amount);
     Console.WriteLine($"Sve transakcije ispod {amount} EUR su obrisane.");
 }
+
 static void DeleteTransactionsAboveAmount(List<(int, double, string, string, string, DateTime)> transactions)
 {
     Console.Write("Unesite iznos iznad kojeg želite izbrisati sve transakcije: ");
@@ -786,16 +789,19 @@ static void DeleteTransactionsAboveAmount(List<(int, double, string, string, str
     transactions.RemoveAll(t => t.Item2 > amount);
     Console.WriteLine($"Sve transakcije iznad {amount} EUR su obrisane.");
 }
+
 static void DeleteAllIncome(List<(int, double, string, string, string, DateTime)> transactions)
 {
     transactions.RemoveAll(t => t.Item4 == "Prihod");
     Console.WriteLine("Sve transakcije tipa 'Prihod' su obrisane.");
 }
+
 static void DeleteAllExpenses(List<(int, double, string, string, string, DateTime)> transactions)
 {
     transactions.RemoveAll(t => t.Item4 == "Rashod");
     Console.WriteLine("Sve transakcije tipa 'Rashod' su obrisane.");
 }
+
 static void DeleteTransactionsByCategory(List<(int, double, string, string, string, DateTime)> transactions)
 {
     Console.Write("Unesite kategoriju za brisanje transakcija: ");
@@ -804,4 +810,177 @@ static void DeleteTransactionsByCategory(List<(int, double, string, string, stri
     transactions.RemoveAll(t => t.Item5.Equals(category, StringComparison.OrdinalIgnoreCase));
     Console.WriteLine($"Sve transakcije za kategoriju '{category}' su obrisane.");
 }
+
+static void ViewTransactions(List<(int, double, string, string, string, DateTime)> transactions)
+{
+    while (true)
+    {
+        Console.Clear();
+        Console.WriteLine("Odaberite nacin na koji zelite pregledati transakcije:\n\t1 - sve transakcije kako su spremljene\n\t2 - sve transakcije sortirane po iznosu uzlazno\n\t3 - sve transakcije sortirane po iznosu silazno\n\t4 - sve transakcije sortirane po opisu abecedno\n\t5 - sve transakcije sortirane po datumu uzlazno\n\t6 - sve transakcije sortirane po datumu silazno\n\t7 - svi prihodi\n\t8 - svi rashodi\n\t9 - sve transakcije za odabranu kategoriju\n\t10 - sve transakcije za odabrani tip i kategoriju\n\t11 - izlaz");
+        
+        int option;
+        if (int.TryParse(Console.ReadLine(), out option))
+        {
+            switch (option)
+            {
+                case 1:
+                    PrintAllTransactions(transactions);
+                    break;
+                case 2:
+                    PrintTransactionsAscending(transactions);
+                    break;
+                case 3:
+                    PrintTransactionsDescending(transactions);
+                    break;
+                case 4:
+                    PrintTransactionsSortedByDescription(transactions);
+                    break;
+                case 5:
+                    PrintTransactionsAscendingDate(transactions);
+                    break;
+                case 6:
+                    PrintTransactionsDescendingDate(transactions);
+                    break;
+                case 7:
+                    PrintIncomeTransactions(transactions);
+                    break;
+                case 8:
+                    PrintExpenseTransactions(transactions);
+                    break;
+                case 9:
+                    PrintTransactionsByCategory(transactions);                   
+                    break;
+                case 10:
+                    PrintTransactionsByTypeAndCategory(transactions);
+                    break;
+                case 11:
+                    return;
+                default:
+                    Console.WriteLine("Nevazeca opcija! Pokušajte ponovno.");
+                    break;
+            }
+        }
+        else
+        {
+            Console.WriteLine("Nevazeci unos! Pokusajte ponovno.");
+        }
+    }
+}
+static void PrintAllTransactions(List<(int, double, string, string, string, DateTime)> transactions)
+{
+    Console.WriteLine("Sve transakcije:");
+    foreach (var transaction in transactions)
+    {
+        Console.WriteLine($"Tip: {transaction.Item4}, Iznos: {transaction.Item2} Eur, Opis: {transaction.Item3}, Kategorija: {transaction.Item5}, Datum: {transaction.Item6}");
+    }
+    Console.WriteLine("Pritisnite Enter za povratak na izbornik...");
+    Console.ReadKey();
+}
+static void PrintTransactionsAscending(List<(int, double, string, string, string, DateTime)> transactions)
+{
+    var sortedTransactions = transactions.OrderBy(t => t.Item2).ToList();
+    Console.WriteLine("Transakcije sortirane po iznosu uzlazno:");
+    foreach (var transaction in sortedTransactions)
+    {
+        Console.WriteLine($"Tip: {transaction.Item4}, Iznos: {transaction.Item2} Eur, Opis: {transaction.Item3}, Kategorija: {transaction.Item5}, Datum: {transaction.Item6}");
+    }
+    Console.WriteLine("Pritisnite Enter za povratak na izbornik...");
+    Console.ReadKey();
+}
+static void PrintTransactionsDescending(List<(int, double, string, string, string, DateTime)> transactions)
+{
+    var sortedTransactions = transactions.OrderByDescending(t => t.Item2).ToList();
+    Console.WriteLine("Transakcije sortirane po iznosu silazno:");
+    foreach (var transaction in sortedTransactions)
+    {
+        Console.WriteLine($"Tip: {transaction.Item4}, Iznos: {transaction.Item2} Eur, Opis: {transaction.Item3}, Kategorija: {transaction.Item5}, Datum: {transaction.Item6}");
+    }
+    Console.WriteLine("Pritisnite Enter za povratak na izbornik...");
+    Console.ReadKey();
+}
+static void PrintTransactionsSortedByDescription(List<(int, double, string, string, string, DateTime)> transactions)
+{
+    var sortedTransactions = transactions.OrderBy(t => t.Item3).ToList();
+    Console.WriteLine("Transakcije sortirane po opisu abecedno:");
+    foreach (var transaction in sortedTransactions)
+    {
+        Console.WriteLine($"Tip: {transaction.Item4}, Iznos: {transaction.Item2} Eur, Opis: {transaction.Item3}, Kategorija: {transaction.Item5}, Datum: {transaction.Item6}");
+    }
+    Console.WriteLine("Pritisnite Enter za povratak na izbornik...");
+    Console.ReadKey();
+}
+static void PrintTransactionsAscendingDate(List<(int, double, string, string, string, DateTime)> transactions)
+{
+    var sortedTransactions = transactions.OrderBy(t => t.Item6).ToList();
+    Console.WriteLine("Transakcije sortirane po datumu uzlazno:");
+    foreach (var transaction in sortedTransactions)
+    {
+        Console.WriteLine($"Tip: {transaction.Item4}, Iznos: {transaction.Item2} Eur, Opis: {transaction.Item3}, Kategorija: {transaction.Item5}, Datum: {transaction.Item6}");
+    }
+    Console.WriteLine("Pritisnite Enter za povratak na izbornik...");
+    Console.ReadKey();
+}
+static void PrintTransactionsDescendingDate(List<(int, double, string, string, string, DateTime)> transactions)
+{
+    var sortedTransactions = transactions.OrderByDescending(t => t.Item6).ToList();
+    Console.WriteLine("Transakcije sortirane po datumu silazno:");
+    foreach (var transaction in sortedTransactions)
+    {
+        Console.WriteLine($"Tip: {transaction.Item4}, Iznos: {transaction.Item2} Eur, Opis: {transaction.Item3}, Kategorija: {transaction.Item5}, Datum: {transaction.Item6}");
+    }
+    Console.WriteLine("Pritisnite Enter za povratak na izbornik...");
+    Console.ReadKey();
+}
+static void PrintIncomeTransactions(List<(int, double, string, string, string, DateTime)> transactions)
+{
+    var incomeTransactions = transactions.Where(t => t.Item4 == "Prihod").ToList();
+    Console.WriteLine("Svi prihodi:");
+    foreach (var transaction in incomeTransactions)
+    {
+        Console.WriteLine($"Tip: {transaction.Item4}, Iznos: {transaction.Item2} Eur, Opis: {transaction.Item3}, Kategorija: {transaction.Item5}, Datum: {transaction.Item6}");
+    }
+    Console.WriteLine("Pritisnite Enter za povratak na izbornik...");
+    Console.ReadKey();
+}
+static void PrintExpenseTransactions(List<(int, double, string, string, string, DateTime)> transactions)
+{
+    var expenseTransactions = transactions.Where(t => t.Item4 == "Rashod").ToList();
+    Console.WriteLine("Svi rashodi:");
+    foreach (var transaction in expenseTransactions)
+    {
+        Console.WriteLine($"Tip: {transaction.Item4}, Iznos: {transaction.Item2} Eur, Opis: {transaction.Item3}, Kategorija: {transaction.Item5}, Datum: {transaction.Item6}");
+    }
+    Console.WriteLine("Pritisnite Enter za povratak na izbornik...");
+    Console.ReadKey();
+}
+static void PrintTransactionsByCategory(List<(int, double, string, string, string, DateTime)> transactions)
+{
+    Console.Write("Unesite kategoriju: ");
+    string category = Console.ReadLine();
+    var categoryTransactions = transactions.Where(t => t.Item5.Equals(category, StringComparison.OrdinalIgnoreCase)).ToList();
+    Console.WriteLine($"Transakcije za kategoriju {category}:");
+    foreach (var transaction in categoryTransactions)
+    {
+        Console.WriteLine($"Tip: {transaction.Item4}, Iznos: {transaction.Item2} Eur, Opis: {transaction.Item3}, Kategorija: {transaction.Item5}, Datum: {transaction.Item6}");
+    }
+    Console.WriteLine("Pritisnite Enter za povratak na izbornik...");
+    Console.ReadKey();
+}
+static void PrintTransactionsByTypeAndCategory(List<(int, double, string, string, string, DateTime)> transactions)
+{
+    Console.Write("Unesite tip (Prihod/Rashod): ");
+    string type = Console.ReadLine();
+    Console.Write("Unesite kategoriju: ");
+    string category = Console.ReadLine();
+
+    var filteredTransactions = transactions.Where(t => t.Item4.Equals(type, StringComparison.OrdinalIgnoreCase) && t.Item5.Equals(category, StringComparison.OrdinalIgnoreCase)).ToList();
+    Console.WriteLine($"Transakcije za tip '{type}' i kategoriju '{category}':");
+    foreach (var transaction in filteredTransactions)
+    {
+        Console.WriteLine($"Tip: {transaction.Item4}, Iznos: {transaction.Item2} Eur, Opis: {transaction.Item3}, Kategorija: {transaction.Item5}, Datum: {transaction.Item6}");
+    }
+    Console.WriteLine("Pritisnite Enter za povratak na izbornik...");
+    Console.ReadKey();
+}
+
 
