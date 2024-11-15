@@ -3,3 +3,13 @@ C:\Users\laura\OneDrive\Desktop\DUMP\Financije_App\Financije_App\obj\Debug\net6.
 C:\Users\laura\OneDrive\Desktop\DUMP\Financije_App\Financije_App\obj\Debug\net6.0\Financije_App.AssemblyInfoInputs.cache
 C:\Users\laura\OneDrive\Desktop\DUMP\Financije_App\Financije_App\obj\Debug\net6.0\Financije_App.AssemblyInfo.cs
 C:\Users\laura\OneDrive\Desktop\DUMP\Financije_App\Financije_App\obj\Debug\net6.0\Financije_App.csproj.CoreCompileInputs.cache
+C:\Users\laura\OneDrive\Desktop\DUMP\Financije_App\Financije_App\bin\Debug\net6.0\Financije_App.exe
+C:\Users\laura\OneDrive\Desktop\DUMP\Financije_App\Financije_App\bin\Debug\net6.0\Financije_App.deps.json
+C:\Users\laura\OneDrive\Desktop\DUMP\Financije_App\Financije_App\bin\Debug\net6.0\Financije_App.runtimeconfig.json
+C:\Users\laura\OneDrive\Desktop\DUMP\Financije_App\Financije_App\bin\Debug\net6.0\Financije_App.dll
+C:\Users\laura\OneDrive\Desktop\DUMP\Financije_App\Financije_App\bin\Debug\net6.0\Financije_App.pdb
+C:\Users\laura\OneDrive\Desktop\DUMP\Financije_App\Financije_App\obj\Debug\net6.0\Financije_App.dll
+C:\Users\laura\OneDrive\Desktop\DUMP\Financije_App\Financije_App\obj\Debug\net6.0\refint\Financije_App.dll
+C:\Users\laura\OneDrive\Desktop\DUMP\Financije_App\Financije_App\obj\Debug\net6.0\Financije_App.pdb
+C:\Users\laura\OneDrive\Desktop\DUMP\Financije_App\Financije_App\obj\Debug\net6.0\Financije_App.genruntimeconfig.cache
+C:\Users\laura\OneDrive\Desktop\DUMP\Financije_App\Financije_App\obj\Debug\net6.0\ref\Financije_App.dll

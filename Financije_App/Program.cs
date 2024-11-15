@@ -1,7 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Xml.Serialization;
 
-//var accountList = new List<(string, double)>();
 var userList = new List<(int, string, string, DateOnly, List<(string, double, List<(int, double, string, string, string, DateTime)>)>)>();
 
 var nextId = 1;
@@ -9,6 +10,8 @@ var nextTransactionId = 1;
 
 while (true)
 {
+    Console.Clear();
+
     Console.WriteLine("1 - Korisnici\n2 - Racuni\n3 - Izlaz iz aplikacije");
     Console.Write("\nIzaberite neku od ponudenih opcija: ");
 
@@ -29,13 +32,14 @@ while (true)
                     CreateUser(userList, ref nextId);
                     break;
                 case 2:
-                    DeleteUser();
+                    DeleteUser(userList); 
                     break;
                 case 3:
+                    CreateTransaction(userList, ref nextTransactionId);
                     //EditUser();
                     break;
                 case 4:
-                    //PrintUsers();
+                    PrintUsers(userList);
                     break;
                 default:
                     Console.WriteLine("Nevazeca Opcija! Pokusajte ponovno.");
@@ -98,57 +102,75 @@ static void CreateUser(List<(int, string, string, DateOnly, List<(string, double
             continue;
         }
     }
-    Console.WriteLine("Pritisnite bilokoju tipku za povratak u izbornik...\n");
-    Console.ReadKey();
+    Console.WriteLine("\nPritisnite 1 za unos jos jednog korisnika ili Enter za povratak u izbornik...\n");
+
+    if (int.TryParse(Console.ReadLine(), out var choice) && choice == 1)
+    {
+        CreateUser(userList, ref nextId);
+    }
+    else
+        return;
 }
 
 static void CreateTransaction(List<(int, string, string, DateOnly, List<(string, double, List<(int, double, string, string, string, DateTime)>)>)> userList, ref int nextTransactionId)
 {
-
-    if (userList.Count == 0)
-    {
-        Console.WriteLine("Lista korisnika je prazna.");
-        return;
-    }
-
-    Console.WriteLine("Odaberite korisnika po ID-u:");
-    foreach (var user in userList)
-    {
-        Console.WriteLine($"ID: {user.Item1}, Ime: {user.Item2}, Prezime: {user.Item3}");
-    }
-
-    int.TryParse(Console.ReadLine(), out var userId);
-
     bool userFound = false;
     (int, string, string, DateOnly, List<(string, double, List<(int, double, string, string, string, DateTime)>)>) selectedUser = default;
 
-    foreach (var user in userList)
+    if (userList.Count == 0)
     {
-        if (user.Item1 == userId)
+        Console.WriteLine("Lista korisnika je prazna. Vratite se na glavni izbornik pritiskom bilokoje tipke i unesite korisnike...");
+        Console.ReadKey();
+        return;
+    }
+
+    while (true)
+    {
+        Console.WriteLine("Odaberite korisnika po ID-u:");
+        foreach (var user in userList)
         {
-            selectedUser = user;
-            userFound = true;
+            Console.WriteLine($"ID: {user.Item1}, Ime: {user.Item2}, Prezime: {user.Item3}");
+        }
+
+        int.TryParse(Console.ReadLine(), out var userId);
+
+        foreach (var user in userList)
+        {
+            if (user.Item1 == userId)
+            {
+                selectedUser = user;
+                userFound = true;
+                break;
+            }
+        }
+
+        if (userFound)
+        {
+            Console.WriteLine($"Pronaden korisnik: {selectedUser.Item2} {selectedUser.Item3}");
             break;
         }
-    }
-
-    if (!userFound)
-    {
-        Console.WriteLine("Korisnik nije pronaden.");
-    }
-    else
-    {
-        Console.WriteLine($"Pronaden korisnik: {selectedUser.Item2} {selectedUser.Item3}");
+        else
+        {
+            Console.WriteLine("Korisnik nije pronaden. Pokusajte ponovno.");
+        }
 
     }
 
-    Console.WriteLine("Unesite iznos transakcije:");
-    double.TryParse(Console.ReadLine(), out var amount);
+    double amount = 0;
 
-    if (amount <= 0)
+    Console.WriteLine("Unesite iznos transakcije (mora biti veci od 0): ");
+
+    while (true)
     {
-        Console.WriteLine("Iznos transakcije mora biti pozitivan. Pokusajte ponovno.");
-        return;
+
+        if ((double.TryParse(Console.ReadLine(), out amount) && amount > 0))
+        {
+            break;
+        }
+        else {
+            Console.WriteLine("Iznos transakcije mora biti veci od 0! Pokusajte ponovno.");
+            continue;
+        }
     }
 
     Console.WriteLine("Unesite opis transakcije (pritisnite Enter za default transakciju):");
@@ -159,58 +181,239 @@ static void CreateTransaction(List<(int, string, string, DateOnly, List<(string,
         description = "Standardna transakcija";
     }
 
+    int transactionType;
+    string category = "";
+
     Console.WriteLine("Odaberite tip transakcije (1 - Prihod, 2 - Rashod)");
-    int.TryParse(Console.ReadLine(), out var transactionType);
 
-    var category = "";
-    var type = transactionType = 1 ? "Prihod" : "Rashod";
-
-    if (transactionType == 1)
+    while (true)
     {
-        Console.WriteLine("Odaberite kategoriju prihoda (1 - Placa, 2 - Honorar, 3 - Poklon");
-        int.TryParse(Console.ReadLine(), out var incomeCategory);
+        int.TryParse(Console.ReadLine(), out transactionType);
 
-        switch (incomeCategory)
+
+        var type = (transactionType == 1) ? "Prihod" : "Rashod";
+
+        if (transactionType == 1)
         {
-            case 1:
-                category = "Plaća";
-                break;
-            case 2:
-                category = "Honorar";
-                break;
-            case 3:
-                category = "Poklon";
-                break;
-            default:
-                category = "Ostalo";
-                break;
+            Console.WriteLine("Odaberite kategoriju prihoda (1 - Placa, 2 - Honorar, 3 - Poklon)");
+            int.TryParse(Console.ReadLine(), out var incomeCategory);
+
+            switch (incomeCategory)
+            {
+                case 1:
+                    category = "Plaća";
+                    break;
+                case 2:
+                    category = "Honorar";
+                    break;
+                case 3:
+                    category = "Poklon";
+                    break;
+                default:
+                    category = "Ostalo";
+                    break;
+            }
+            break;
+        }
+        else if (transactionType == 2)
+        {
+            Console.WriteLine("Odaberite kategoriju rashoda (1 - Hrana, 2 - Prijevoz, 3 - Sport");
+            int.TryParse(Console.ReadLine(), out var expenseCategory);
+            switch (expenseCategory)
+            {
+                case 1:
+                    category = "Hrana";
+                    break;
+                case 2:
+                    category = "Prijevoz";
+                    break;
+                case 3:
+                    category = "Sport";
+                    break;
+                default:
+                    category = "Ostalo";
+                    break;
+            }
+            break;
+        }
+
+        else
+        {
+            Console.WriteLine("Nevazeci tip transakcije. Unesite 1 za Prihod ili 2 za Rashod");
+            continue;
         }
     }
-    else if (transactionType == 2)
+
+    var transaction = (nextTransactionId++, amount, description, (transactionType == 1) ? "Prihod" : "Rashod", category, DateTime.Now);
+
+    for (int i = 0; i < userList.Count; i++)
     {
-        Console.WriteLine("Odaberite kategoriju rashoda ( 1 - Hrana, 2 - Prijevoz, 3 - Sport");
-        int.TryParse(Console.ReadLine(), out var expenseCategory);
-        switch (expenseCategory)
+        if (userList[i].Item1 == selectedUser.Item1)
         {
-            case 1:
-                category = "Hrana";
-                break;
-            case 2:
-                category = "Prijevoz";
-                break;
-            case 3:
-                category = "Sport";
-                break;
-            default:
-                category = "Ostalo";
-                break;
+            userList[i].Item5.Add((category, amount, new List<(int, double, string, string, string, DateTime)> {transaction}));
+            break;
         }
     }
-    else
+
+    Console.WriteLine("Transakcija uspjesno dodana! Pritisnite bilokoju tipku za povratak na glavni izbornik...");
+    Console.ReadKey();
+    return;
+}
+
+static void DeleteUser(List<(int, string, string, DateOnly, List<(string, double, List<(int, double, string, string, string, DateTime)>)>)> userList)
+{
+
+    Console.Clear();
+
+    Console.WriteLine("Izaberi način brisanja korisnika:\n\t 1 - po ID-u\n\t 2 - po imenu i prezimenu");
+
+    var choice = 0;
+
+    while (true)
     {
-        Console.WriteLine("Nevazeci tip transakcije.");
+
+        if ((!int.TryParse(Console.ReadLine(), out choice) || (choice != 1 && choice != 2)))
+
+        {
+            Console.WriteLine("Pogrešan unos! Unesite broj 1 ili 2.");
+            continue;
+        }
+
+        break;
+    }
+
+    if (choice == 1)
+    {
+        DeleteUserById(userList);
+    }
+    else {
+        DeleteUserByFullName(userList);
+    }
+
+    Console.WriteLine("Pritisnite Enter za povratak u glavni izbornik...");
+    return;
+}
+
+static void DeleteUserById(List < (int, string, string, DateOnly, List<(string, double, List<(int, double, string, string, string, DateTime)>)>) > userList) {
+
+    if (userList.Count == 0)
+    {
+        Console.WriteLine("Lista korisnika je prazna. Molimo unesite neke korisnike prije brisanja.");
         return;
     }
 
-    var transaction = (nextTransactionId++, amount, description, transactionType, category, DateTime.Now());
+    else
+    {
+
+        Console.WriteLine("Unesite ID korinsika kojeg zelite obrisati: ");
+
+        foreach (var user in userList)
+        {
+            Console.WriteLine($"ID: {user.Item1}, Ime: {user.Item2}, Prezime: {user.Item3}");
+        }
+
+    }
+
+    var userId = 0;
+    bool userFound = false;
+
+    do
+    {
+
+        if (!int.TryParse(Console.ReadLine(), out userId))
+        {
+
+            Console.WriteLine("Pogresan unos! ID mora biti broj.");
+            continue;
+        }
+
+        userFound = false;
+
+        for (int i = 0; i < userList.Count(); i++) {
+            if (userList[i].Item1 == userId) {
+                userList.RemoveAt(i);
+                userFound = true;
+                Console.WriteLine($"Korisnik s ID-om {userId} uspješno izbrisan.");
+                break;
+            }
+        }
+
+        if (!userFound)
+        {
+            Console.WriteLine($"Korisnik s upisanim ID-om ({userId}) ne postoji! Pokusajte ponovno.");
+        }
+
+    } while (!userFound);
+
+    Console.WriteLine("Pritisnite Enter za povratak u glavni izbornik...");
+    return;
+}
+
+static void DeleteUserByFullName(List < (int, string, string, DateOnly, List<(string, double, List<(int, double, string, string, string, DateTime)>)>) > userList) {
+
+    if (userList.Count == 0)
+    {
+        Console.WriteLine("Lista korisnika je prazna. Molimo unesite neke korisnike prije brisanja.");
+        return;
+    }
+
+    else
+    {
+
+        Console.WriteLine("Unesite ime i prezime korinsika kojeg zelite obrisati: ");
+
+        foreach (var user in userList)
+        {
+            Console.WriteLine($"ID: {user.Item1}, Ime: {user.Item2}, Prezime: {user.Item3}");
+        }
+
+    }
+
+    var fullName = Console.ReadLine();
+    var splitName = fullName.Split(' ');
+
+    if (splitName.Length != 2)
+    {
+        Console.WriteLine("Pogrešan unos. Molimo unesite ime i prezime u formatu 'Ime Prezime'.");
+        return;
+    }
+
+    foreach (var user in userList)
+    {
+        Console.WriteLine($"ID: {user.Item1}, Ime: {user.Item2}, Prezime: {user.Item3}");
+    }
+
+    var firstName = splitName[0];
+    var lastName = splitName[1];
+
+    bool userFound = false;
+
+    do
+    {
+        for (int i = 0; i < userList.Count; i++)
+        {
+            if (userList[i].Item2 == firstName && userList[i].Item3 == lastName)
+            {
+                Console.WriteLine($"Korisnik s imenom {firstName} {lastName} pronađen. Brisanje korisnika...");
+                userList.RemoveAt(i);
+                userFound = true;
+                Console.WriteLine($"Korisnik {firstName} {lastName} uspješno izbrisan.");
+                i--;
+            }
+        }
+
+        if (!userFound)
+        {
+            Console.WriteLine($"Korisnik s upisanim imenom ({firstName} {lastName}) ne postoji! Pokusajte ponovno.");
+            continue;
+        }
+
+    } while(!userFound);
+
+    Console.WriteLine("Pritisnite Enter za povratak u glavni izbornik...");
+    return;
+}
+
+static void PrintUsers(List<(int, string, string, DateOnly, List<(string, double, List<(int, double, string, string, string, DateTime)>)>)> userList) {
+    
 }
