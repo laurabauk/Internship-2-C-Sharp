@@ -32,7 +32,7 @@ while (true)
                     CreateUser(userList, ref nextId);
                     break;
                 case 2:
-                    DeleteUser(userList); 
+                    DeleteUser(userList);
                     break;
                 case 3:
                     CreateTransaction(userList, ref nextTransactionId);
@@ -52,31 +52,78 @@ while (true)
     else if (option == 2)
     {
         Console.WriteLine("2. Racuni");
-        Console.WriteLine("Unesite ime i prezime korisnika cijim racunima zelite upravljati: ");
 
-        var wantedUser = Console.ReadLine();
-        var user = userList.Find(u => u.Item2== wantedUser);
+        Console.WriteLine("Unesite ime zeljenog korisnika: ");
+        var firstName = Console.ReadLine();
+        Console.WriteLine("Unesite prezime zeljenog korisnika:");
+        var lastName = Console.ReadLine();
 
-        if (user.Equals(default((int, string, string, DateOnly, List<(string, double, List<(int, double, string, string, string, DateTime)>)>))))
-        {
-            Console.WriteLine("Korisnik nije pronaden!");
-            return;
+        var selectedUser = userList.Find(user => user.Item2.Equals(firstName) && user.Item3.Equals(lastName));
+
+        if (selectedUser.Item1 == 0) {
+            Console.WriteLine("Korisnik nije pronaden. Pritisnite Enter za povratak na glavni izbornik...");
+            Console.ReadKey();
+            continue;
         }
 
-        Console.WriteLine("1 - Pregled racuna");
+        Console.WriteLine($"Odabrani korisnik: {selectedUser.Item2} {selectedUser.Item3}");
 
-        int.TryParse(Console.ReadLine(), out var accountOption);
+        if (selectedUser.Item5.Count == 0)
+        {
+            Console.WriteLine("Nema računa za ovog korisnika.");
+            Console.ReadKey();
+            continue;
+        }
 
-        switch (accountOption) {
+        Console.WriteLine("Odaberite račun:");
+        for (int i = 0; i < selectedUser.Item5.Count; i++)
+        {
+            Console.WriteLine($"{i + 1} - {selectedUser.Item5[i].Item1} (Stanje: {selectedUser.Item5[i].Item2} EUR)");
+        }
+
+        int.TryParse(Console.ReadLine(), out var accountIndex);
+
+        if (accountIndex < 1 || accountIndex > selectedUser.Item5.Count)
+        {
+            Console.WriteLine("Nevažeći odabir računa. Pritisnite bilo koju tipku za povratak...");
+            Console.ReadKey();
+            continue;
+        }
+
+        var selectedAccount = selectedUser.Item5[accountIndex - 1];
+
+        Console.Clear();
+
+        Console.WriteLine($"Odabran je {selectedAccount.Item1} racun.");
+        Console.WriteLine("Unesite zeljenu opciju za upravljanje transakcijama na tom racunu:\n1 - Unos nove transakcije\n\ta) trenutno izvrsena transakcija\n\tb) ranije izvrsena transakcija\n2 - Brisanje transakcije\n\ta) po id-u\n\tb) ispod unesenog iznosa\n\tc) iznad unesenog iznosa\n\td) svih prihoda\n\te) svih rashoda\n\tf) svih transakcija za odabranu kategoriju\n3 - Uredivanje transakcije\n\ta) po id-u\n4 - Pregled transakcija\n\ta) sve transakcije kako su spremljene\n\tb) sve transakcije sortirane po iznosu uzlazno\n\tc)sve transakcije po iznosu silazno\n\td)sve transakcije sortirane po opisu abecedno\n\te) sve transakcije po datumu uzlazno\n\tf)sve transakcije po datumu silazno\n\tg)svi prihodi\n\th)svi rashodi\n\ti)sve transakcije za odabranu kategoriju\n\tj)sve transakcije za odabrani tip i kategoriju\n5 - Financijsko izvjesce\n\ta)trenutno stanje racuna\n\tb)broj ukupnih transakcija\n\tc)ukupan iznos prihoda i rashoda za odabrani mjesec i godinu\n\td)postotak udjela rashoda za odabranu kategoriju\n\te)prosjecni iznos transakcije za odabrani mjesec i godinu\n\tf)prosjecni iznos transakcije za odabranu kategoriju");
+
+        int.TryParse(Console.ReadLine(), out var transactionOption);
+
+        switch (transactionOption) {
             case 1:
-                PrintAccounts(user.Item5);
+                CreateTransaction(userList, ref nextTransactionId);
+                Console.WriteLine("Pritisni Enter za povratak na glavni izbornik...");
+                Console.ReadKey();
+                return;
+            case 2:
+                //DeleteTransaction(selectedAccount);
+                break;
+            case 3:
+                //EditTransaction(selectedAcount);
+                break;
+            case 4:
+                //PrintTransactions(selectedAccount);
+                break;
+            case 5:
+                //PrintFinancialReport(selectedAccount);
                 break;
             default:
-                Console.WriteLine("Opcija nije ponudena!");
-                break;
+                Console.WriteLine("Nevazeca Opcija! Pokusajte ponovno.");
+                continue;
         }
 
-
+        return;
+    
     }
     else if (option == 3)
     {
@@ -88,6 +135,7 @@ while (true)
         Console.WriteLine("Nevazeca opcija! Pokusajte ponovno.");
     }
 }
+
 static void PrintAccounts(List<(int, string, string, DateOnly, List<(string, double, List<(int, double, string, string, string, DateTime)>)>)> userList)
 {
     if (userList.Count == 0)
@@ -245,7 +293,8 @@ static void CreateTransaction(List<(int, string, string, DateOnly, List<(string,
         {
             break;
         }
-        else {
+        else
+        {
             Console.WriteLine("Iznos transakcije mora biti veci od 0! Pokusajte ponovno.");
             continue;
         }
@@ -328,12 +377,12 @@ static void CreateTransaction(List<(int, string, string, DateOnly, List<(string,
     {
         if (userList[i].Item1 == selectedUser.Item1)
         {
-            userList[i].Item5.Add((category, amount, new List<(int, double, string, string, string, DateTime)> {transaction}));
+            userList[i].Item5.Add((category, amount, new List<(int, double, string, string, string, DateTime)> { transaction }));
             break;
         }
     }
 
-    Console.WriteLine("Transakcija uspjesno dodana! Pritisnite bilokoju tipku za povratak na glavni izbornik...");
+    Console.WriteLine("Transakcija uspjesno dodana! Pritisnite Enter za izlaz...");
     Console.ReadKey();
     return;
 }
@@ -367,7 +416,8 @@ static void DeleteUser(List<(int, string, string, DateOnly, List<(string, double
         Console.ReadKey();
         return;
     }
-    else {
+    else
+    {
         DeleteUserByFullName(userList);
         Console.WriteLine("Pritisni Enter za povratak na glavni izbornik...");
         Console.ReadKey();
@@ -378,7 +428,8 @@ static void DeleteUser(List<(int, string, string, DateOnly, List<(string, double
     return;
 }
 
-static void DeleteUserById(List < (int, string, string, DateOnly, List<(string, double, List<(int, double, string, string, string, DateTime)>)>) > userList) {
+static void DeleteUserById(List<(int, string, string, DateOnly, List<(string, double, List<(int, double, string, string, string, DateTime)>)>)> userList)
+{
 
     if (userList.Count == 0)
     {
@@ -413,8 +464,10 @@ static void DeleteUserById(List < (int, string, string, DateOnly, List<(string, 
 
         userFound = false;
 
-        for (int i = 0; i < userList.Count(); i++) {
-            if (userList[i].Item1 == userId) {
+        for (int i = 0; i < userList.Count(); i++)
+        {
+            if (userList[i].Item1 == userId)
+            {
                 userList.RemoveAt(i);
                 userFound = true;
                 Console.WriteLine($"Korisnik s ID-om {userId} uspješno izbrisan.");
@@ -432,7 +485,8 @@ static void DeleteUserById(List < (int, string, string, DateOnly, List<(string, 
     return;
 }
 
-static void DeleteUserByFullName(List < (int, string, string, DateOnly, List<(string, double, List<(int, double, string, string, string, DateTime)>)>) > userList) {
+static void DeleteUserByFullName(List<(int, string, string, DateOnly, List<(string, double, List<(int, double, string, string, string, DateTime)>)>)> userList)
+{
 
     if (userList.Count == 0)
     {
@@ -487,7 +541,7 @@ static void DeleteUserByFullName(List < (int, string, string, DateOnly, List<(st
             continue;
         }
 
-    } while(!userFound);
+    } while (!userFound);
 
     return;
 }
