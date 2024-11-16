@@ -1319,7 +1319,7 @@ void EditUser(List<(int id, string firstName, string lastName, DateOnly birthDat
             selectedUser.birthDate = newBirthDate;
             break;
         default:
-            Console.WriteLine("Nevazeca opcija! Ponovno pokusajte.");
+            Console.WriteLine("Nevazeca opcija! Pokusajte ponovno.");
             return;
     }
 
