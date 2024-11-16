@@ -1197,7 +1197,7 @@ static void PrintAverageTransactionForCategory(List<(int, double, string, string
         Console.WriteLine($"Nema pronadenih transakcija za kategoriju {category}.");
     }
 }
-void EditTransaction(List<(int transactionId, double amount, string description, string type, string category, DateTime date)> transactions)
+static void EditTransaction(List<(int transactionId, double amount, string description, string type, string category, DateTime date)> transactions)
 {
 
     Console.WriteLine("Popis svih transakcija:");
@@ -1265,7 +1265,7 @@ void EditTransaction(List<(int transactionId, double amount, string description,
     Console.WriteLine("Transakcija uspješno uredena!");
 }
 
-void EditUser(List<(int id, string firstName, string lastName, DateOnly birthDate, List<(string accountName, double balance, List<(int transactionId, double amount, string description, string type, string category, DateTime date)>)>)> userList)
+static void EditUser(List<(int id, string firstName, string lastName, DateOnly birthDate, List<(string accountName, double balance, List<(int transactionId, double amount, string description, string type, string category, DateTime date)>)>)> userList)
 {
     Console.WriteLine("Popis svih korisnika:");
     for (int i = 0; i < userList.Count; i++)
