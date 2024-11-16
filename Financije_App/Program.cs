@@ -35,7 +35,7 @@ while (true)
                     DeleteUser(userList);
                     break;
                 case 3:
-                    //CreateTransaction(userList, ref nextTransactionId);
+                    //EditUser();
                     break;
                 case 4:
                     PrintUsers(userList);
@@ -84,7 +84,7 @@ while (true)
 
         if (accountIndex < 1 || accountIndex > selectedUser.Item5.Count)
         {
-            Console.WriteLine("Nevažeći odabir računa. Pritisnite bilo koju tipku za povratak...");
+            Console.WriteLine("Nevazeci odabir računa. Pritisnite Enter za povratak...");
             Console.ReadKey();
             continue;
         }
@@ -112,7 +112,7 @@ while (true)
                 ViewTransactions(selectedAccount.Item3);
                 break;
             case 5:
-                //PrintFinancialReport(selectedAccount);
+                PrintFinancialReport(selectedAccount.Item3);
                 break;
             default:
                 Console.WriteLine("Nevazeca Opcija! Pokusajte ponovno.");
@@ -434,8 +434,6 @@ static void DeleteUser(List<(int, string, string, DateOnly, List<(string, double
         return;
     }
 
-    Console.WriteLine("Pritisnite Enter za povratak u glavni izbornik...");
-    return;
 }
 
 static void DeleteUserById(List<(int, string, string, DateOnly, List<(string, double, List<(int, double, string, string, string, DateTime)>)>)> userList)
@@ -866,6 +864,7 @@ static void ViewTransactions(List<(int, double, string, string, string, DateTime
         }
     }
 }
+
 static void PrintAllTransactions(List<(int, double, string, string, string, DateTime)> transactions)
 {
     Console.WriteLine("Sve transakcije:");
@@ -876,6 +875,7 @@ static void PrintAllTransactions(List<(int, double, string, string, string, Date
     Console.WriteLine("Pritisnite Enter za povratak na izbornik...");
     Console.ReadKey();
 }
+
 static void PrintTransactionsAscending(List<(int, double, string, string, string, DateTime)> transactions)
 {
     var sortedTransactions = transactions.OrderBy(t => t.Item2).ToList();
@@ -887,6 +887,7 @@ static void PrintTransactionsAscending(List<(int, double, string, string, string
     Console.WriteLine("Pritisnite Enter za povratak na izbornik...");
     Console.ReadKey();
 }
+
 static void PrintTransactionsDescending(List<(int, double, string, string, string, DateTime)> transactions)
 {
     var sortedTransactions = transactions.OrderByDescending(t => t.Item2).ToList();
@@ -898,6 +899,7 @@ static void PrintTransactionsDescending(List<(int, double, string, string, strin
     Console.WriteLine("Pritisnite Enter za povratak na izbornik...");
     Console.ReadKey();
 }
+
 static void PrintTransactionsSortedByDescription(List<(int, double, string, string, string, DateTime)> transactions)
 {
     var sortedTransactions = transactions.OrderBy(t => t.Item3).ToList();
@@ -909,6 +911,7 @@ static void PrintTransactionsSortedByDescription(List<(int, double, string, stri
     Console.WriteLine("Pritisnite Enter za povratak na izbornik...");
     Console.ReadKey();
 }
+
 static void PrintTransactionsAscendingDate(List<(int, double, string, string, string, DateTime)> transactions)
 {
     var sortedTransactions = transactions.OrderBy(t => t.Item6).ToList();
@@ -920,6 +923,7 @@ static void PrintTransactionsAscendingDate(List<(int, double, string, string, st
     Console.WriteLine("Pritisnite Enter za povratak na izbornik...");
     Console.ReadKey();
 }
+
 static void PrintTransactionsDescendingDate(List<(int, double, string, string, string, DateTime)> transactions)
 {
     var sortedTransactions = transactions.OrderByDescending(t => t.Item6).ToList();
@@ -931,6 +935,7 @@ static void PrintTransactionsDescendingDate(List<(int, double, string, string, s
     Console.WriteLine("Pritisnite Enter za povratak na izbornik...");
     Console.ReadKey();
 }
+
 static void PrintIncomeTransactions(List<(int, double, string, string, string, DateTime)> transactions)
 {
     var incomeTransactions = transactions.Where(t => t.Item4 == "Prihod").ToList();
@@ -942,6 +947,7 @@ static void PrintIncomeTransactions(List<(int, double, string, string, string, D
     Console.WriteLine("Pritisnite Enter za povratak na izbornik...");
     Console.ReadKey();
 }
+
 static void PrintExpenseTransactions(List<(int, double, string, string, string, DateTime)> transactions)
 {
     var expenseTransactions = transactions.Where(t => t.Item4 == "Rashod").ToList();
@@ -953,6 +959,7 @@ static void PrintExpenseTransactions(List<(int, double, string, string, string, 
     Console.WriteLine("Pritisnite Enter za povratak na izbornik...");
     Console.ReadKey();
 }
+
 static void PrintTransactionsByCategory(List<(int, double, string, string, string, DateTime)> transactions)
 {
     Console.Write("Unesite kategoriju: ");
@@ -966,6 +973,7 @@ static void PrintTransactionsByCategory(List<(int, double, string, string, strin
     Console.WriteLine("Pritisnite Enter za povratak na izbornik...");
     Console.ReadKey();
 }
+
 static void PrintTransactionsByTypeAndCategory(List<(int, double, string, string, string, DateTime)> transactions)
 {
     Console.Write("Unesite tip (Prihod/Rashod): ");
@@ -981,6 +989,211 @@ static void PrintTransactionsByTypeAndCategory(List<(int, double, string, string
     }
     Console.WriteLine("Pritisnite Enter za povratak na izbornik...");
     Console.ReadKey();
+}
+
+static void PrintFinancialReport(List<(int, double, string, string, string, DateTime)> transactions)
+{
+    if (transactions.Count == 0)
+    {
+        Console.WriteLine("Nema dostupnih transakcija za financijsko izvješće.");
+        return;
+    }
+
+    Console.Clear();
+    Console.WriteLine("\nOdaberite opciju za financijsko izvjesce:\n\t1 - trenutno stanje racuna\n\t2 - broj ukupnih transakcija\n\t3 - ukupan iznos prihoda i rashoda za odabrani mjesec i godinu\n\t4 - postotak udjela rashoda za odabranu kategoriju\n\t5 - prosječni iznos transakcije za odabrani mjesec i godinu\n\t6 - prosječni iznos transakcije za odabranu kategoriju\n\t7 - izlaz");
+    
+    int.TryParse(Console.ReadLine(), out var reportOption);
+
+    switch (reportOption)
+    {
+        case 1:
+            PrintCurrentBalance(transactions);
+            break;
+        case 2:
+            PrintTotalTransactionCount(transactions);
+            break;
+        case 3:
+            PrintIncomeExpenseForMonth(transactions);
+            break;
+        case 4:
+            PrintExpensePercentageByCategory(transactions);
+            break;
+        case 5:
+            PrintAverageTransactionForMonth(transactions);
+            break;
+        case 6:
+            PrintAverageTransactionForCategory(transactions);
+            break;
+        case 7:
+            return;
+        default:
+            Console.WriteLine("Nevazeca opcija! Pokušajte ponovno.");
+            break;
+    }
+
+    Console.WriteLine("\nPritisnite Enter za izlaz...");
+    Console.ReadLine();
+    return;
+}
+
+static void PrintCurrentBalance(List<(int, double, string, string, string, DateTime)> transactions)
+{
+    double totalIncome = 0;
+    double totalExpense = 0;
+
+    foreach (var transaction in transactions)
+    {
+        if (transaction.Item4 == "Prihod")
+        {
+            totalIncome += transaction.Item2;
+        }
+        else if (transaction.Item4 == "Trošak")
+        {
+            totalExpense += transaction.Item2;
+        }
+    }
+
+    double currentBalance = totalIncome - totalExpense;
+
+    Console.WriteLine("\nTrenutno stanje racuna:");
+    Console.WriteLine($"Ukupni prihodi: {totalIncome} Eur");
+    Console.WriteLine($"Ukupni troskovi: {totalExpense} Eur");
+    Console.WriteLine($"Stanje: {currentBalance} EUR");
+
+    if (currentBalance < 0)
+    {
+        Console.WriteLine("Upozorenje: Trenutno ste u minusu!");
+    }
+
+}
+
+static void PrintTotalTransactionCount(List<(int, double, string, string, string, DateTime)> transactions)
+{
+    int transactionCount = transactions.Count;
+
+    Console.WriteLine("\nUkupan broj transakcija:");
+    Console.WriteLine($"Broj transakcija: {transactionCount}");
+}
+
+static void PrintIncomeExpenseForMonth(List<(int, double, string, string, string, DateTime)> transactions)
+{
+    Console.Write("Unesite mjesec (1-12): ");
+    int.TryParse(Console.ReadLine(), out var month);
+
+    Console.Write("Unesite godinu: ");
+    int.TryParse(Console.ReadLine(), out var year);
+
+    double totalIncome = 0;
+    double totalExpense = 0;
+
+    foreach (var transaction in transactions)
+    {
+        if (transaction.Item6.Month == month && transaction.Item6.Year == year)
+        {
+            if (transaction.Item4 == "Prihod")
+            {
+                totalIncome += transaction.Item2;
+            }
+            else if (transaction.Item4 == "Trosak")
+            {
+                totalExpense += transaction.Item2;
+            }
+        }
+    }
+
+    Console.WriteLine($"\nUkupno za {month}/{year}:");
+    Console.WriteLine($"Prihodi: {totalIncome} Eur");
+    Console.WriteLine($"Troškovi: {totalExpense} Eur");
+}
+
+static void PrintExpensePercentageByCategory(List<(int, double, string, string, string, DateTime)> transactions)
+{
+    Console.Write("Unesite kategoriju (npr. Hrana, Sport): ");
+    var category = Console.ReadLine();
+
+    double totalExpense = 0;
+    double categoryExpense = 0;
+
+    foreach (var transaction in transactions)
+    {
+        if (transaction.Item4 == "Trosak")
+        {
+            totalExpense += transaction.Item2;
+            if (transaction.Item5.Equals(category, StringComparison.OrdinalIgnoreCase))
+            {
+                categoryExpense += transaction.Item2;
+            }
+        }
+    }
+
+    if (totalExpense > 0)
+    {
+        double percentage = (categoryExpense / totalExpense) * 100;
+        Console.WriteLine($"\nPostotak troskova za kategoriju {category}: {percentage:F2}%");
+    }
+    else
+    {
+        Console.WriteLine("Nema dostupnih troskova za izracun postotka.");
+    }
+}
+
+static void PrintAverageTransactionForMonth(List<(int, double, string, string, string, DateTime)> transactions)
+{
+    Console.Write("Unesite mjesec (1-12): ");
+    int.TryParse(Console.ReadLine(), out var month);
+
+    Console.Write("Unesite godinu: ");
+    int.TryParse(Console.ReadLine(), out var year);
+
+    double totalAmount = 0;
+    int transactionCount = 0;
+
+    foreach (var transaction in transactions)
+    {
+        if (transaction.Item6.Month == month && transaction.Item6.Year == year)
+        {
+            totalAmount += transaction.Item2;
+            transactionCount++;
+        }
+    }
+
+    if (transactionCount > 0)
+    {
+        double average = totalAmount / transactionCount;
+        Console.WriteLine($"\nProsjecni iznos transakcije za {month}/{year}: {average:F2} EUR");
+    }
+    else
+    {
+        Console.WriteLine("Nema pronadenih transakcija za odabrani mjesec i godinu.");
+    }
+}
+
+static void PrintAverageTransactionForCategory(List<(int, double, string, string, string, DateTime)> transactions)
+{
+    Console.Write("Unesite kategoriju (npr. Hrana, Sport): ");
+    var category = Console.ReadLine();
+
+    double totalAmount = 0;
+    var transactionCount = 0;
+
+    foreach (var transaction in transactions)
+    {
+        if (transaction.Item5.Equals(category, StringComparison.OrdinalIgnoreCase))
+        {
+            totalAmount += transaction.Item2;
+            transactionCount++;
+        }
+    }
+
+    if (transactionCount > 0)
+    {
+        double average = totalAmount / transactionCount;
+        Console.WriteLine($"\nProsjecni iznos transakcije za kategoriju {category}: {average:F2} Eur");
+    }
+    else
+    {
+        Console.WriteLine($"Nema pronadenih transakcija za kategoriju {category}.");
+    }
 }
 
 
