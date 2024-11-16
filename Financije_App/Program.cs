@@ -35,7 +35,7 @@ while (true)
                     DeleteUser(userList);
                     break;
                 case 3:
-                    //EditUser();
+                    EditUser(userList);
                     break;
                 case 4:
                     PrintUsers(userList);
@@ -59,7 +59,8 @@ while (true)
 
         var selectedUser = userList.Find(user => user.Item2.Equals(firstName) && user.Item3.Equals(lastName));
 
-        if (selectedUser.Item1 == 0) {
+        if (selectedUser.Item1 == 0)
+        {
             Console.WriteLine("Korisnik nije pronaden. Pritisnite Enter za povratak na glavni izbornik...");
             Console.ReadKey();
             continue;
@@ -98,7 +99,8 @@ while (true)
 
         int.TryParse(Console.ReadLine(), out var transactionOption);
 
-        switch (transactionOption) {
+        switch (transactionOption)
+        {
             case 1:
                 CreateTransaction(userList, ref nextTransactionId);
                 continue;
@@ -106,7 +108,7 @@ while (true)
                 DeleteTransactions(selectedAccount.Item3);
                 break;
             case 3:
-                //EditTransaction(selectedAcount);
+                EditTransaction(selectedAccount.Item3);
                 break;
             case 4:
                 ViewTransactions(selectedAccount.Item3);
@@ -120,7 +122,7 @@ while (true)
         }
 
         return;
-    
+
     }
     else if (option == 3)
     {
@@ -815,7 +817,7 @@ static void ViewTransactions(List<(int, double, string, string, string, DateTime
     {
         Console.Clear();
         Console.WriteLine("Odaberite nacin na koji zelite pregledati transakcije:\n\t1 - sve transakcije kako su spremljene\n\t2 - sve transakcije sortirane po iznosu uzlazno\n\t3 - sve transakcije sortirane po iznosu silazno\n\t4 - sve transakcije sortirane po opisu abecedno\n\t5 - sve transakcije sortirane po datumu uzlazno\n\t6 - sve transakcije sortirane po datumu silazno\n\t7 - svi prihodi\n\t8 - svi rashodi\n\t9 - sve transakcije za odabranu kategoriju\n\t10 - sve transakcije za odabrani tip i kategoriju\n\t11 - izlaz");
-        
+
         int option;
         if (int.TryParse(Console.ReadLine(), out option))
         {
@@ -846,7 +848,7 @@ static void ViewTransactions(List<(int, double, string, string, string, DateTime
                     PrintExpenseTransactions(transactions);
                     break;
                 case 9:
-                    PrintTransactionsByCategory(transactions);                   
+                    PrintTransactionsByCategory(transactions);
                     break;
                 case 10:
                     PrintTransactionsByTypeAndCategory(transactions);
@@ -1001,7 +1003,7 @@ static void PrintFinancialReport(List<(int, double, string, string, string, Date
 
     Console.Clear();
     Console.WriteLine("\nOdaberite opciju za financijsko izvjesce:\n\t1 - trenutno stanje racuna\n\t2 - broj ukupnih transakcija\n\t3 - ukupan iznos prihoda i rashoda za odabrani mjesec i godinu\n\t4 - postotak udjela rashoda za odabranu kategoriju\n\t5 - prosječni iznos transakcije za odabrani mjesec i godinu\n\t6 - prosječni iznos transakcije za odabranu kategoriju\n\t7 - izlaz");
-    
+
     int.TryParse(Console.ReadLine(), out var reportOption);
 
     switch (reportOption)
@@ -1195,5 +1197,136 @@ static void PrintAverageTransactionForCategory(List<(int, double, string, string
         Console.WriteLine($"Nema pronadenih transakcija za kategoriju {category}.");
     }
 }
+void EditTransaction(List<(int transactionId, double amount, string description, string type, string category, DateTime date)> transactions)
+{
+
+    Console.WriteLine("Popis svih transakcija:");
+    for (int i = 0; i < transactions.Count; i++)
+    {
+        var transaction = transactions[i];
+        Console.WriteLine($"{i + 1}. ID: {transaction.transactionId} - {transaction.type} - {transaction.amount} Eur - {transaction.description} - {transaction.category} - {transaction.date:dd.MM.yyyy}");
+    }
+
+    Console.Write("Unesite ID transakcije za uredivanje: ");
+    int.TryParse(Console.ReadLine(), out int transactionId);
+
+    var transactionIndex = -1;
+    for (int i = 0; i < transactions.Count; i++)
+    {
+        if (transactions[i].transactionId == transactionId)
+        {
+            transactionIndex = i;
+            break;
+        }
+    }
+
+    if (transactionIndex == -1)
+    {
+        Console.WriteLine("Transakcija s tim ID-em nije pronadena.");
+        return;
+    }
+
+    var selectedTransaction = transactions[transactionIndex];
+    Console.WriteLine($"Pronadena transakcija: {selectedTransaction.type} - {selectedTransaction.amount} Eur - {selectedTransaction.description}");
+
+    Console.WriteLine("\nSto zelite promijeniti?\n1 - Iznos\n2 - Opis\n3 - Tip (prihod/rashod)\n4 - Kategorija\n5 - Datum");
+    int.TryParse(Console.ReadLine(), out int editOption);
+
+    switch (editOption)
+    {
+        case 1:
+            Console.Write("Unesite novi iznos: ");
+            double.TryParse(Console.ReadLine(), out double newAmount);
+            selectedTransaction.amount = newAmount;
+            break;
+        case 2:
+            Console.Write("Unesite novi opis: ");
+            selectedTransaction.description = Console.ReadLine();
+            break;
+        case 3:
+            Console.Write("Unesite novi tip (prihod/rashod): ");
+            selectedTransaction.type = Console.ReadLine();
+            break;
+        case 4:
+            Console.Write("Unesite novu kategoriju: ");
+            selectedTransaction.category = Console.ReadLine();
+            break;
+        case 5:
+            Console.Write("Unesite novi datum (date-month-year): ");
+            DateTime.TryParse(Console.ReadLine(), out DateTime newDate);
+            selectedTransaction.date = newDate;
+            break;
+        default:
+            Console.WriteLine("Nevažeća opcija! Ponovno pokušajte.");
+            return;
+    }
+
+    transactions[transactionIndex] = selectedTransaction;
+    Console.WriteLine("Transakcija uspješno uredena!");
+}
+
+void EditUser(List<(int id, string firstName, string lastName, DateOnly birthDate, List<(string accountName, double balance, List<(int transactionId, double amount, string description, string type, string category, DateTime date)>)>)> userList)
+{
+    Console.WriteLine("Popis svih korisnika:");
+    for (int i = 0; i < userList.Count; i++)
+    {
+        var user = userList[i];
+        Console.WriteLine($"{i + 1}. ID: {user.id} - {user.firstName} {user.lastName} - Roden: {user.birthDate:dd.MM.yyyy}");
+    }
+
+    Console.Write("\nUnesite ID korisnika za uredivanje: ");
+    int.TryParse(Console.ReadLine(), out int userId);
+
+
+    var userIndex = -1;
+    for (int i = 0; i < userList.Count; i++)
+    {
+        if (userList[i].id == userId)
+        {
+            userIndex = i;
+            break;
+        }
+    }
+
+    if (userIndex == -1)
+    {
+        Console.WriteLine("Korisnik s tim ID-om nije pronaden.");
+        return;
+    }
+
+
+    var selectedUser = userList[userIndex];
+    Console.WriteLine($"Pronaden korisnik: {selectedUser.firstName} {selectedUser.lastName}");
+
+
+    Console.WriteLine("\nSto zelite promijeniti?\n1 - Ime\n2 - Prezime\n3 - Datum rodenja");
+    int.TryParse(Console.ReadLine(), out int editOption);
+
+
+    switch (editOption)
+    {
+        case 1:
+            Console.Write("Unesite novo ime: ");
+            selectedUser.firstName = Console.ReadLine();
+            break;
+        case 2:
+            Console.Write("Unesite novo prezime: ");
+            selectedUser.lastName = Console.ReadLine();
+            break;
+        case 3:
+            Console.Write("Unesite novi datum rođenja (date-month-year): ");
+            DateOnly.TryParse(Console.ReadLine(), out DateOnly newBirthDate);
+            selectedUser.birthDate = newBirthDate;
+            break;
+        default:
+            Console.WriteLine("Nevazeca opcija! Ponovno pokusajte.");
+            return;
+    }
+
+
+    userList[userIndex] = selectedUser;
+    Console.WriteLine("Korisnik uspjesno ureden!");
+}
+
 
 
